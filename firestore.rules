@@ -49,18 +49,15 @@ service cloud.firestore {
 
     // Subjects collection
     match /subjects/{subjectId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read, write: if true;
     }
 
     // Questions bank
     match /questions/{questionId} {
-      allow read: if true; 
-      allow write: if isAdmin() || isTeacher();
+      allow read, write: if true; 
       
       match /{allSubcollections=**} {
-        allow read: if true;
-        allow write: if isAdmin() || isTeacher();
+        allow read, write: if true;
       }
     }
 
@@ -75,12 +72,10 @@ service cloud.firestore {
 
     // Exams collection
     match /exams/{examId} {
-      allow read: if true; 
-      allow write: if isAdmin() || isTeacher();
+      allow read, write: if true; 
       
       match /{allSubcollections=**} {
-        allow read: if true;
-        allow write: if isAdmin() || isTeacher();
+        allow read, write: if true;
       }
     }
 
@@ -95,8 +90,7 @@ service cloud.firestore {
 
     // Results collection
     match /results/{resultId} {
-      allow read: if true;
-      allow write: if isAdmin() || isTeacher();
+      allow read, write: if true;
     }
 
     // Training Materials (PHASE — MODUL MATERI)
