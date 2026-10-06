@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GLOBAL HELPERS
+    // ─────────────────────────────────────────────────────────────────────────
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isSignedIn() && exists(path) ? get(path).data : {};
+    }
+
+    function hasRole(role) {
+      return isSignedIn() && getUserData().role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isTeacher() {
+      return hasRole('teacher');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // RULES
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Users collection
+    match /users/{userId} {
+      allow get, list, write: if true; 
+    }
+
+    // Usernames mapping
+    match /usernames/{usernameId} {
+      allow get, list, write: if true;
+    }
+
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Subjects collection
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Questions bank
+    match /questions/{questionId} {
+      allow read: if true; 
+      allow write: if isAdmin() || isTeacher();
+      
+      match /{allSubcollections=**} {
+        allow read: if true;
+        allow write: if isAdmin() || isTeacher();
+      }
+    }
+
+    // Question imports session
+    match /questionImports/{importId} {
+      allow read, write: if true; 
+      
+      match /{allSubcollections=**} {
+        allow read, write: if true;
+      }
+    }
+
+    // Exams collection
+    match /exams/{examId} {
+      allow read: if true; 
+      allow write: if isAdmin() || isTeacher();
+      
+      match /{allSubcollections=**} {
+        allow read: if true;
+        allow write: if isAdmin() || isTeacher();
+      }
+    }
+
+    // Attempts collection (recursive for answers subcollection)
+    match /attempts/{attemptId} {
+      allow read, write: if true; 
+      
+      match /{allSubcollections=**} {
+        allow read, write: if true;
+      }
+    }
+
+    // Results collection
+    match /results/{resultId} {
+      allow read: if true;
+      allow write: if isAdmin() || isTeacher();
+    }
+
+    // Training Materials (PHASE — MODUL MATERI)
+    match /materials/{materialId} {
+      allow read, write: if true;
+    }
+
+    // Phase 6: Attempt Results
+    match /attemptResults/{attemptId} {
+      allow read: if true;
+      allow write: if true;
+
+      match /questionResults/{questionId} {
+        allow read, write: if true;
+      }
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

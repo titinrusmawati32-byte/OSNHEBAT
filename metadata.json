@@ -1,0 +1,8 @@
+{
+  "name": "OLYMPIAD CBT - Sistem Ujian Pembinaan Olimpiade SD",
+  "description": "Platform Computer Based Test (CBT) modern, responsif, dan aman untuk pembinaan olimpiade tingkat SD di 4 bidang: IPA, IPS, Matematika, dan Bahasa Inggris.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access for Admin, Guru, and Siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "username": { "type": "string", "maxLength": 64 },
+        "password": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "guru", "siswa"] },
+        "school": { "type": "string", "maxLength": 128 },
+        "grade": { "type": "string", "maxLength": 64 },
+        "subjectAccess": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "username", "name", "role"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Olympiad competition subject (IPA, IPS, Matematika, Bahasa Inggris)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 64 },
+        "code": { "type": "string", "maxLength": 32 },
+        "accentColor": { "type": "string", "maxLength": 32 },
+        "description": { "type": "string", "maxLength": 256 },
+        "icon": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "code", "accentColor"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Olympiad exam question item with 4 options and explanation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "subjectId": { "type": "string", "maxLength": 64 },
+        "question": { "type": "string", "maxLength": 4000 },
+        "optionA": { "type": "string", "maxLength": 1000 },
+        "optionB": { "type": "string", "maxLength": 1000 },
+        "optionC": { "type": "string", "maxLength": 1000 },
+        "optionD": { "type": "string", "maxLength": 1000 },
+        "correctAnswer": { "type": "string", "enum": ["A", "B", "C", "D"] },
+        "explanation": { "type": "string", "maxLength": 2000 },
+        "difficulty": { "type": "string", "enum": ["Mudah", "Sedang", "Sulit"] },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "subjectId", "question", "optionA", "optionB", "optionC", "optionD", "correctAnswer", "difficulty"]
+    },
+    "Exam": {
+      "title": "Exam",
+      "description": "Exam package configuration for Olympiad test",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "subjectId": { "type": "string", "maxLength": 64 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "questionCount": { "type": "number" },
+        "durationMinutes": { "type": "number" },
+        "startDate": { "type": "string", "maxLength": 64 },
+        "endDate": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["draft", "active", "completed"] },
+        "randomizeQuestions": { "type": "boolean" },
+        "randomizeOptions": { "type": "boolean" },
+        "showResultsImmediately": { "type": "boolean" },
+        "questionIds": { "type": "array" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "title", "subjectId", "questionCount", "durationMinutes", "status"]
+    },
+    "Attempt": {
+      "title": "Attempt",
+      "description": "Active or finished exam session for a student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "examId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 128 },
+        "studentUsername": { "type": "string", "maxLength": 64 },
+        "subjectId": { "type": "string", "maxLength": 64 },
+        "questionOrder": { "type": "array" },
+        "answers": { "type": "object" },
+        "markedQuestions": { "type": "array" },
+        "startedAt": { "type": "number" },
+        "durationMinutes": { "type": "number" },
+        "expiresAt": { "type": "number" },
+        "submittedAt": { "type": "number" },
+        "status": { "type": "string", "enum": ["in_progress", "submitted", "expired", "terminated_violation"] },
+        "tabSwitchCount": { "type": "number" },
+        "violations": { "type": "array" },
+        "lastSavedAt": { "type": "number" }
+      },
+      "required": ["id", "examId", "userId", "startedAt", "expiresAt", "status"]
+    },
+    "Result": {
+      "title": "Result",
+      "description": "Final scored exam result for leaderboard, review, and analytics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "attemptId": { "type": "string", "maxLength": 128 },
+        "examId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 128 },
+        "studentUsername": { "type": "string", "maxLength": 64 },
+        "school": { "type": "string", "maxLength": 128 },
+        "grade": { "type": "string", "maxLength": 64 },
+        "subjectId": { "type": "string", "maxLength": 64 },
+        "score": { "type": "number" },
+        "correctCount": { "type": "number" },
+        "incorrectCount": { "type": "number" },
+        "unansweredCount": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "percentage": { "type": "number" },
+        "timeSpentSeconds": { "type": "number" },
+        "tabSwitchCount": { "type": "number" },
+        "submittedAt": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "attemptId", "examId", "userId", "score", "totalQuestions"]
+    },
+    "Material": {
+      "title": "Material",
+      "description": "Training material in PDF or YouTube video format",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "subjectId": { "type": "string", "enum": ["ipa", "ips", "matematika", "bahasa_inggris"] },
+        "gradeLevel": { "type": "string", "maxLength": 64 },
+        "topic": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["pdf", "youtube"] },
+        "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+        "fileName": { "type": "string", "maxLength": 256 },
+        "fileSize": { "type": "number" },
+        "filePath": { "type": "string", "maxLength": 512 },
+        "fileUrl": { "type": "string", "maxLength": 1024 },
+        "youtubeUrl": { "type": "string", "maxLength": 1024 },
+        "youtubeVideoId": { "type": "string", "maxLength": 32 },
+        "youtubeEmbedUrl": { "type": "string", "maxLength": 1024 },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdByName": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "object" },
+        "updatedAt": { "type": "object" },
+        "publishedAt": { "type": "object" }
+      },
+      "required": ["id", "title", "subjectId", "type", "status", "createdBy"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and credentials"
+    },
+    "/subjects/{subjectId}": {
+      "schema": { "$ref": "#/entities/Subject" },
+      "description": "Available competition subjects"
+    },
+    "/questions/{questionId}": {
+      "schema": { "$ref": "#/entities/Question" },
+      "description": "Question bank for each subject"
+    },
+    "/exams/{examId}": {
+      "schema": { "$ref": "#/entities/Exam" },
+      "description": "Exam packages created by teachers or admins"
+    },
+    "/attempts/{attemptId}": {
+      "schema": { "$ref": "#/entities/Attempt" },
+      "description": "Individual student test attempts and live responses"
+    },
+    "/results/{resultId}": {
+      "schema": { "$ref": "#/entities/Result" },
+      "description": "Final scored results for student review and rankings"
+    },
+    "/materials/{materialId}": {
+      "schema": { "$ref": "#/entities/Material" },
+      "description": "Training materials (PDF and YouTube) for students"
+    }
+  }
+}
