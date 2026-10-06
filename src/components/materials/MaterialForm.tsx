@@ -280,13 +280,13 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/40 text-rose-600">
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/40 text-rose-600 shrink-0">
                       <FileText className="w-5 h-5" />
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate max-w-[200px]">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                         {fileName}
                       </p>
                       <p className="text-[10px] text-slate-400 font-bold uppercase">
@@ -294,31 +294,33 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
                       </p>
                     </div>
                   </div>
-                  {!isUploading && !isSubmitting && (
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setFile(null);
-                        setFileUrl('');
-                        setFileName('');
-                        setFileSize(0);
-                      }}
-                      className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                  {isUploading && (
-                    <div className="flex flex-col items-end gap-1 min-w-[80px]">
-                      <span className="text-[10px] font-black text-blue-600 uppercase">Mengunggah... {Math.round(uploadProgress)}%</span>
-                      <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-blue-600 transition-all duration-300"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
+                  <div className="flex items-center justify-between w-full sm:w-auto gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-700">
+                    {!isUploading && !isSubmitting && (
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setFile(null);
+                          setFileUrl('');
+                          setFileName('');
+                          setFileSize(0);
+                        }}
+                        className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 transition-colors ml-auto sm:ml-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                    {isUploading && (
+                      <div className="flex flex-col items-end gap-1.5 w-full sm:w-40 ml-auto">
+                        <span className="text-[10px] font-black text-blue-600 uppercase">Mengunggah... {Math.round(uploadProgress)}%</span>
+                        <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-blue-600 transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
