@@ -61,7 +61,7 @@ export const ExamCard: React.FC<ExamCardProps> = ({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2">
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Layers className="w-3.5 h-3.5" />
-              <span>{exam.questionIds.length} Soal</span>
+              <span>{(exam.questionIds || []).length} Soal</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Clock className="w-3.5 h-3.5" />

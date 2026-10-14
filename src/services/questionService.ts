@@ -72,26 +72,27 @@ export async function createQuestion(
 
   const questionText = data.questionText || data.question || '';
 
-  const docPayload = {
+  const docPayload: any = {
     id: newDocRef.id,
-    subjectId: data.subjectId,
+    subjectId: data.subjectId || 'ipa',
     questionNumber: data.questionNumber || null,
     questionText,
     options,
     correctAnswer: data.correctAnswer || 'A',
-    explanation: data.explanation || null,
-    imageUrl: data.imageUrl || null,
-    imageAlt: data.imageAlt || null,
     difficulty: data.difficulty || 'medium',
-    createdBy: data.createdBy,
-    createdByName: data.createdByName,
+    createdBy: data.createdBy || '',
+    createdByName: data.createdByName || 'Guru Pembina',
     sourceType: data.sourceType || 'manual',
-    sourceFileName: data.sourceFileName || null,
-    importSessionId: data.importSessionId || null,
     isActive: data.isActive !== false,
     createdAt: now,
     updatedAt: now,
   };
+
+  if (data.explanation) docPayload.explanation = data.explanation;
+  if (data.imageUrl) docPayload.imageUrl = data.imageUrl;
+  if (data.imageAlt) docPayload.imageAlt = data.imageAlt;
+  if (data.sourceFileName) docPayload.sourceFileName = data.sourceFileName;
+  if (data.importSessionId) docPayload.importSessionId = data.importSessionId;
 
   await setDoc(newDocRef, docPayload);
 
@@ -106,21 +107,23 @@ export async function updateQuestion(
   const docRef = doc(db, QUESTIONS_COL, questionId);
   const now = serverTimestamp();
 
-  const payload: any = {
-    ...updates,
+  const cleanPayload: any = {
     updatedAt: now,
   };
 
-  if (updates.options) {
-    payload.options = updates.options;
+  for (const [key, value] of Object.entries(updates)) {
+    if (value !== undefined) {
+      cleanPayload[key] = value;
+    }
   }
 
-  await updateDoc(docRef, payload);
+  await updateDoc(docRef, cleanPayload);
 }
 
-// Delete question
+// Delete question permanently from Firestore
 export async function deleteQuestion(questionId: string): Promise<void> {
-  await deleteDoc(doc(db, QUESTIONS_COL, questionId));
+  const docRef = doc(db, QUESTIONS_COL, questionId);
+  await deleteDoc(docRef);
 }
 
 // Get all questions with optional filters
@@ -152,9 +155,11 @@ export async function getQuestions(
     });
 
     return questions.sort((a, b) => {
-      // Sort by questionNumber or creation time
+      // Sort by questionNumber if both present, else by creation time
       if (a.questionNumber && b.questionNumber) return a.questionNumber - b.questionNumber;
-      return 0;
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+      return timeB - timeA;
     });
   } catch (error) {
     console.error('Failed to get questions from Firestore:', error);

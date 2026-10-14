@@ -39,7 +39,13 @@ export function useMaterials(options: UseMaterialsOptions = {}) {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const docs = snapshot.docs.map((doc) => doc.data() as TrainingMaterial);
+        const docs = snapshot.docs
+          .map((doc) => doc.data() as TrainingMaterial)
+          .sort((a, b) => {
+            const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+            const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+            return timeB - timeA;
+          });
         setMaterials(docs);
         setLoading(false);
       },

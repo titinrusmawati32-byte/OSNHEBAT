@@ -19,29 +19,42 @@ const EXAMS_COLLECTION = 'exams';
 
 export const examService = {
   async getAllExams() {
-    const q = query(collection(db, EXAMS_COLLECTION), orderBy('createdAt', 'desc'));
+    const q = collection(db, EXAMS_COLLECTION);
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    return list.sort((a, b) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+      return timeB - timeA;
+    });
   },
 
   async getExamsByTeacher(teacherId: string) {
     const q = query(
       collection(db, EXAMS_COLLECTION), 
-      where('createdBy', '==', teacherId),
-      orderBy('createdAt', 'desc')
+      where('createdBy', '==', teacherId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    return list.sort((a, b) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+      return timeB - timeA;
+    });
   },
 
   async getActiveExams() {
     const q = query(
       collection(db, EXAMS_COLLECTION),
-      where('status', '==', 'active'),
-      orderBy('createdAt', 'desc')
+      where('status', '==', 'active')
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ExamPackage));
+    return list.sort((a, b) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+      return timeB - timeA;
+    });
   },
 
   async getExamById(id: string) {
@@ -54,8 +67,15 @@ export const examService = {
   },
 
   async createExam(examData: Omit<ExamPackage, 'id' | 'createdAt' | 'updatedAt'>) {
+    const cleanData: any = {};
+    for (const [key, value] of Object.entries(examData)) {
+      if (value !== undefined) {
+        cleanData[key] = value;
+      }
+    }
+
     const docRef = await addDoc(collection(db, EXAMS_COLLECTION), {
-      ...examData,
+      ...cleanData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -64,10 +84,15 @@ export const examService = {
 
   async updateExam(id: string, examData: Partial<ExamPackage>) {
     const docRef = doc(db, EXAMS_COLLECTION, id);
-    await updateDoc(docRef, {
-      ...examData,
+    const cleanData: any = {
       updatedAt: serverTimestamp()
-    });
+    };
+    for (const [key, value] of Object.entries(examData)) {
+      if (value !== undefined) {
+        cleanData[key] = value;
+      }
+    }
+    await updateDoc(docRef, cleanData);
   },
 
   async deleteExam(id: string) {

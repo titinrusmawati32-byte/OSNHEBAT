@@ -29,12 +29,19 @@ export const materialService = {
     const docRef = doc(collection(db, MATERIALS_COL));
     const now = serverTimestamp();
     
+    const cleanData: any = {};
+    for (const [key, value] of Object.entries(materialData)) {
+      if (value !== undefined) {
+        cleanData[key] = value;
+      }
+    }
+
     const payload = {
-      ...materialData,
+      ...cleanData,
       id: docRef.id,
       createdAt: now,
       updatedAt: now,
-      publishedAt: materialData.status === 'published' ? now : null,
+      publishedAt: cleanData.status === 'published' ? now : null,
     };
 
     await setDoc(docRef, payload);
@@ -50,7 +57,7 @@ export const materialService = {
     status?: MaterialStatus | 'all';
     createdBy?: string;
   }) => {
-    let q = query(collection(db, MATERIALS_COL), orderBy('createdAt', 'desc'));
+    let q = collection(db, MATERIALS_COL) as any;
 
     if (filters?.subjectId && filters.subjectId !== 'all') {
       q = query(q, where('subjectId', '==', filters.subjectId));
@@ -77,8 +84,7 @@ export const materialService = {
   }) => {
     let q = query(
       collection(db, MATERIALS_COL), 
-      where('status', '==', 'published'),
-      orderBy('createdAt', 'desc')
+      where('status', '==', 'published')
     );
 
     if (filters?.subjectId && filters.subjectId !== 'all') {

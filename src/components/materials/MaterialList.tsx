@@ -91,12 +91,14 @@ export const MaterialList: React.FC<MaterialListProps> = ({ role }) => {
 
   const confirmDelete = async () => {
     if (!deletingMaterial) return;
+    const target = deletingMaterial;
     try {
-      await materialService.deleteMaterial(deletingMaterial);
-      showToast('Materi berhasil dihapus.', 'success');
+      await materialService.deleteMaterial(target);
+      showToast('Materi dan berkas terkait berhasil dihapus permanen dari server.', 'success');
       setDeletingMaterial(null);
-    } catch (err) {
-      showToast('Gagal menghapus materi.', 'error');
+    } catch (err: any) {
+      console.error('Error deleting material:', err);
+      showToast('Gagal menghapus materi: ' + (err.message || ''), 'error');
     }
   };
 

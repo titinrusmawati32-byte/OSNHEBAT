@@ -110,11 +110,8 @@ export const QuestionBankManager: React.FC = () => {
     if (!profile) return;
     setLoadingQuestions(true);
     try {
-      // Teachers view their own questions or all subject questions; admins view all
-      const createdByParam = isTeacher ? profile.uid : undefined;
       const data = await getQuestions(
-        selectedSubjectFilter !== 'all' ? selectedSubjectFilter : undefined,
-        createdByParam
+        selectedSubjectFilter !== 'all' ? selectedSubjectFilter : undefined
       );
       setQuestions(data);
     } catch (err) {
@@ -930,12 +927,14 @@ export const QuestionBankManager: React.FC = () => {
         onClose={() => setQuestionToDelete(null)}
         onConfirm={async () => {
           if (questionToDelete) {
+            const targetId = questionToDelete;
             try {
-              await deleteQuestion(questionToDelete);
-              setQuestions((prev) => prev.filter((q) => q.id !== questionToDelete));
-              showToast('Soal berhasil dihapus dari Bank Soal.', 'success');
-            } catch (err) {
-              showToast('Gagal menghapus soal.', 'error');
+              await deleteQuestion(targetId);
+              setQuestions((prev) => prev.filter((q) => q.id !== targetId));
+              showToast('Soal berhasil dihapus permanen dari server.', 'success');
+            } catch (err: any) {
+              console.error('Failed to delete question:', err);
+              showToast('Gagal menghapus soal: ' + (err.message || ''), 'error');
             } finally {
               setQuestionToDelete(null);
             }

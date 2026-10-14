@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { TrainingMaterial } from '../../types/material';
 import { Button } from '../ui/Button';
+import { parsePdfUrl } from '../../lib/pdfHelper';
 
 interface MaterialCardProps {
   material: TrainingMaterial;
@@ -124,11 +125,11 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
           <div className="flex items-center gap-1">
             {isPDF && material.fileUrl && (
               <a 
-                href={material.fileUrl} 
+                href={parsePdfUrl(material.fileUrl).downloadUrl || material.fileUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 title="Download PDF"
-                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
               </a>

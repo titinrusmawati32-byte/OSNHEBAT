@@ -43,12 +43,7 @@ export const ExamManager: React.FC = () => {
     if (!profile) return;
     setLoading(true);
     try {
-      let data;
-      if (isAdmin) {
-        data = await examService.getAllExams();
-      } else {
-        data = await examService.getExamsByTeacher(profile.uid);
-      }
+      const data = await examService.getAllExams();
       setExams(data);
     } catch (err) {
       console.error(err);
@@ -77,12 +72,14 @@ export const ExamManager: React.FC = () => {
 
   const handleDelete = async () => {
     if (!examToDelete) return;
+    const targetId = examToDelete;
     try {
-      await examService.deleteExam(examToDelete);
-      setExams(prev => prev.filter(e => e.id !== examToDelete));
-      showToast('Paket ujian berhasil dihapus.', 'success');
-    } catch (err) {
-      showToast('Gagal menghapus paket ujian.', 'error');
+      await examService.deleteExam(targetId);
+      setExams(prev => prev.filter(e => e.id !== targetId));
+      showToast('Paket ujian berhasil dihapus permanen dari server.', 'success');
+    } catch (err: any) {
+      console.error('Error deleting exam:', err);
+      showToast('Gagal menghapus paket ujian: ' + (err.message || ''), 'error');
     } finally {
       setExamToDelete(null);
     }

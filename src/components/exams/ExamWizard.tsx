@@ -148,21 +148,22 @@ export const ExamWizard: React.FC<ExamWizardProps> = ({
     setIsSaving(true);
     try {
       await onSave({
-        title,
-        description,
+        title: title.trim(),
+        description: description.trim() || '',
         subject,
         category,
-        durationMinutes: duration,
+        durationMinutes: duration || 60,
         questionIds: selectedQuestionIds,
         settings,
         status: initialData ? initialData.status : 'draft',
         createdBy: profile.uid,
-        teacherName: profile.displayName || profile.name
+        teacherName: profile.displayName || profile.name || (profile as any).username || 'Guru Pembina'
       });
-      showToast('Paket ujian berhasil disimpan.', 'success');
+      showToast('Paket ujian berhasil disimpan ke server.', 'success');
       onClose();
-    } catch (err) {
-      showToast('Gagal menyimpan paket ujian.', 'error');
+    } catch (err: any) {
+      console.error('Error saving exam package:', err);
+      showToast('Gagal menyimpan paket ujian: ' + (err.message || 'Periksa data input Anda.'), 'error');
     } finally {
       setIsSaving(false);
     }

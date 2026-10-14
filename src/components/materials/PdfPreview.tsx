@@ -1,5 +1,6 @@
 import React from 'react';
 import { Download, ExternalLink, X, FileText } from 'lucide-react';
+import { parsePdfUrl } from '../../lib/pdfHelper';
 
 interface PdfPreviewProps {
   fileUrl: string;
@@ -8,6 +9,11 @@ interface PdfPreviewProps {
 }
 
 export const PdfPreview: React.FC<PdfPreviewProps> = ({ fileUrl, title, onClose }) => {
+  const parsed = parsePdfUrl(fileUrl);
+  const embedSource = parsed.isGoogleDrive 
+    ? parsed.embedUrl 
+    : (fileUrl.includes('#') ? fileUrl : `${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`);
+
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
       {/* PDF Header */}
@@ -20,13 +26,15 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({ fileUrl, title, onClose 
             <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 truncate max-w-[200px] sm:max-w-md">
               {title}
             </h3>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Dokumen Materi PDF</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              {parsed.isGoogleDrive ? 'Dokumen PDF (Google Drive)' : 'Dokumen PDF Cloud'}
+            </p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
           <a 
-            href={fileUrl} 
+            href={parsed.originalUrl || fileUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors shadow-2xs flex items-center gap-2 text-xs font-bold"
@@ -39,7 +47,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({ fileUrl, title, onClose 
           {onClose && (
             <button 
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -50,9 +58,11 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({ fileUrl, title, onClose 
       {/* PDF Viewer Iframe */}
       <div className="flex-1 min-h-[500px] bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center relative">
         <iframe
-          src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-          className="w-full h-full border-none"
+          src={embedSource}
+          className="w-full h-full border-none min-h-[500px]"
           title={title}
+          allow="autoplay; encrypted-media"
+          allowFullScreen
         />
         
         {/* Mobile Fallback Overlay if iframe fails or on very small screens */}
@@ -63,11 +73,13 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({ fileUrl, title, onClose 
       </div>
 
       {/* Footer / Mobile Actions */}
-      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center sm:justify-end">
+      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center sm:justify-end gap-3">
         <a 
-          href={fileUrl} 
+          href={parsed.downloadUrl || fileUrl} 
           download={title}
-          className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 cursor-pointer"
         >
           <Download className="w-4 h-4" />
           DOWNLOAD PDF
